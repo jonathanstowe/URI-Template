@@ -35,14 +35,15 @@ definition of a URI through variable expansion.
 class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
     has Str $.template;
 
-    our grammar Grammar {
-        rule TOP {
-            <expression>*
+    has Grammar $.grammar = our grammar Grammar {
+        regex TOP {
+            <bits>* [ <expression>+ ]* %% <bits>
         }
 
-        rule expression {
-            '{' <operator>? <variable>+ % ',' '}'
+        regex bits { <-[{]>+ }
 
+        regex expression {
+            '{' <operator>? <variable>+ % ',' '}'
         }
 
         regex operator {
@@ -84,10 +85,10 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             '&'
         }
 
-        rule variable {
+        regex variable {
             <variable-name><var-modifier>?
         }
-        token variable-name {
+        regex variable-name {
             <.ident>
         }
 
