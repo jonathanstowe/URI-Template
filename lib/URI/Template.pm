@@ -33,7 +33,22 @@ definition of a URI through variable expansion.
 =end pod
 
 class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
-    has Str $.template;
+    has Str $.template is rw;
+
+    # this holds the parsed parts
+    has @.parts;
+
+
+    class Variable {
+        has Str $.name;
+        has Int $.max-length;
+        has Bool $.explode;
+    }
+
+    class Expression {
+        has $.operator;
+        has Variable @.variables;
+    }
 
     has Grammar $.grammar = our grammar Grammar {
         regex TOP {
@@ -108,6 +123,37 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
     }
 
     my class Actions {
+
+        my @*PARTS = ();
+
+        method TOP($/) {
+            $/.make(@*PARTS);
+        }
+
+        method bits($/) {
+            @*PARTS.push($/.Str);
+        }
+
+        method expression($/) {
+            my $operator =  $/<operator>.defined ?? $/<operator>.Str !! Str;
+            my @variables = $/<variable>.list.map({ $_.made }); 
+            @.PARTS.push(Expression.new(:$operator, :@variables));
+        }
+
+        method variable($/) {
+
+            my Str $name = $/<variable-name>.Str;
+            my Int $max-length;
+            my Bool $explode = False;
+
+            my $vm = $/<var-modifier>;
+
+            if $vm.defined {
+                $max-length = $vm<prefix><max-length>.defined ?? $vm<prefix><max-length>.Int !! Int;
+                $explode = $vm<explode>.defined;
+            }
+            $/.make(Variable.new(:$name, :$max-length, :$explode));
+        }
 
     }
 
