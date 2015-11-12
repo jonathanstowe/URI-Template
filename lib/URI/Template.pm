@@ -122,22 +122,22 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         }
     }
 
-    my class Actions {
+    our class Actions {
 
-        my @*PARTS = ();
+        has @.PARTS = ();
 
         method TOP($/) {
-            $/.make(@*PARTS);
+            $/.make(@!PARTS);
         }
 
         method bits($/) {
-            @*PARTS.push($/.Str);
+            @!PARTS.push($/.Str);
         }
 
         method expression($/) {
             my $operator =  $/<operator>.defined ?? $/<operator>.Str !! Str;
             my @variables = $/<variable>.list.map({ $_.made }); 
-            @.PARTS.push(Expression.new(:$operator, :@variables));
+            @!PARTS.push(Expression.new(:$operator, :@variables));
         }
 
         method variable($/) {
