@@ -5,10 +5,7 @@ use lib 'lib';
 
 use Test;
 
-use Grammar::Tracer;
 use URI::Template;
-
-
 
 my URI::Template $tem = URI::Template.new();
 
