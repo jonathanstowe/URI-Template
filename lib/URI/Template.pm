@@ -46,11 +46,44 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         has Str $.name;
         has Int $.max-length;
         has Bool $.explode;
+
+        multi method process(Str:U $, *%vars) {
+        }
+
+        multi method process('+', *%vars) {
+        }
+
+        multi method process('/', *%vars) {
+        }
+
+        multi method process('#', *%vars) {
+        }
+
+        multi method process('&', *%vars ) {
+
+        }
+
+        multi method process(';', *%vars ) {
+        }
+
+        multi method process('?', *%vars ) {
+        }
+
+        multi method process('.', *%vars ) {
+        }
+
+
     }
 
     class Expression {
         has $.operator;
         has Variable @.variables;
+
+        method process(*%vars) returns Str {
+            my Str $str;
+
+            $str;
+        }
     }
 
     has Grammar $.grammar = our grammar Grammar {
@@ -161,7 +194,9 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
     }
 
     method process(*%vars) returns Str {
+        my Str $string;
 
+        return $string;
     }
 
 }
