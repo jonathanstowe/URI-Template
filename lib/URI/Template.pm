@@ -33,6 +33,9 @@ definition of a URI through variable expansion.
 =end pod
 
 class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
+
+    use URI::Encode;
+
     has Str $.template is rw;
 
     # this holds the parsed parts
