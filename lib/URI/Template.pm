@@ -193,11 +193,57 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
     }
 
+    class X::NoTemplate is Exception {
+        has $.message = "Template is not defined";
+    }
+
+    class X::InvalidTemplate is Exception {
+        has $.message = "Invalid or un-parseable template";
+    }
+
+    method parts() {
+        if not @!parts.elems {
+
+            if $!template.defined {
+
+            
+                my $match = Grammar.parse($!template, Actions.new);
+
+                if $match {
+                    @!parts = $match.made;
+                }
+                else {
+                    X::InvalidTemplate.new.throw;
+                }
+            }
+            else {
+                X::NoTemplate.new.throw;
+            }
+        }
+        @!parts;
+    }
+
     method process(*%vars) returns Str {
         my Str $string;
 
-        return $string;
+        for self.parts -> $part {
+            given $part {
+                when Str {
+                    $string ~= $part
+                }
+                when Expression {
+                    $string ~= $part.process(%vars);
+                }
+                default {
+                    die "Unexpected object of type { $part.WHAT.name } found in parsed template";
+
+                }
+            }
+        }
+
+        $string;
     }
+
 
 }
 # vim: expandtab shiftwidth=4 ft=perl6
