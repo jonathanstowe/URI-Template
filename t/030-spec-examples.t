@@ -32,7 +32,7 @@ for $data.keys.sort -> $label {
 
             }
             lives-ok { $processed = $ut.process(|$variables); }, "process";
-            is $processed, $test[1], "'{ $test[0] }' expands to '{ $test[1] }'";
+            is $processed, any($test[1].list), "'{ $test[0] }' expands to '{ $test[1].list.join(" or ") }'";
         }
 
     }, $label;
