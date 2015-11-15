@@ -66,5 +66,14 @@ for @tests -> $test {
     }, $test<description>;
 }
 
+subtest {
+    my $actions = URI::Template::Actions.new;
+    my $template = '{+path}/here';
+    ok my $res = URI::Template::Grammar.parse($template, :$actions), "matched '$template'";
+    is $res.made.elems, 2, "expect two parts";
+    is $res.made[1], '/here', "and got /here as we expected";
+
+}, "special cases";
+
 done-testing;
 # vim: expandtab shiftwidth=4 ft=perl6
