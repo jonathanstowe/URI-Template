@@ -47,35 +47,93 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         has Int $.max-length;
         has Bool $.explode;
 
+        method get-value(%vars) returns Str {
+            my Str $value;
+
+            if %vars{$!name}:exists {
+                $value = %vars{$!name};
+
+                if $!max-length {
+                    $value = $value.substr(0, $!max-length);
+                }
+            }
+
+
+
+            $value;
+        }
+
         multi method process(Str:U $, %vars) {
             my Str $res;
 
-            if %vars{$!name}:exists {
-                $res = uri_encode_component(%vars{$!name});
+            if self.get-value(%vars) -> $val {
+                $res = uri_encode_component($val);
             }
             $res;
         }
 
         multi method process('+', %vars) {
+            my Str $res;
+
+            if self.get-value(%vars) -> $val {
+                $res = uri_encode($val);
+            }
+            $res;
         }
 
         multi method process('/', %vars) {
+            my Str $res;
+
+            if self.get-value(%vars) -> $val {
+                $res = uri_encode($val);
+            }
+            $res;
         }
 
         multi method process('#', %vars) {
+            my Str $res;
+
+            if self.get-value(%vars) -> $val {
+                $res = uri_encode($val);
+            }
+            $res;
         }
 
         multi method process('&', %vars ) {
+            my Str $res = $!name ~ '=';
+
+            if self.get-value(%vars) -> $val {
+                $res ~= uri_encode_component($val);
+            }
+            $res;
 
         }
 
         multi method process(';', %vars ) {
+            my Str $res = $!name;
+
+            if self.get-value(%vars) -> $val {
+                $res ~= '=' ~ uri_encode($val);
+            }
+            $res;
         }
 
         multi method process('?', %vars ) {
+            my Str $res = $!name ~ '=';
+
+            if self.get-value(%vars) -> $val {
+                $res ~= uri_encode_component($val);
+            }
+            $res;
         }
 
         multi method process('.', %vars ) {
+            my Str $res;
+
+            if self.get-value(%vars) -> $val {
+                $res = uri_encode($val);
+            }
+            $res;
         }
 
     }
@@ -93,20 +151,43 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
                @processed-bits.push($variable.process($.operator, %vars));
             }
 
-            my $joiner = ',';
+            my $joiner = do given $!operator {
+                when '/' {
+                    '/';
+                }
+                when '&' {
+                    '&';
+                }
+                when '?' {
+                    '&';
+                }
+                when '.' {
+                    '.';
+                }
+                when ';' {
+                    ';';
+                }
+                default {
+                    ',';
+                }
+            }
 
             $str = @processed-bits.join($joiner);
+
+            if $!operator.defined && $!operator ne '+' {
+                $str = $!operator ~ $str;
+            }
 
             $str;
         }
     }
 
     has Grammar $.grammar = our grammar Grammar {
-        regex TOP {
-            <bits>* [ <expression>+ ]* %% <bits>
+        rule TOP {
+            <bits>* [ <expression>+ ]* %% <bits>+ 
         }
 
-        regex bits { <-[{]>+ }
+        token bits { <-[{]>+ }
 
         regex expression {
             '{' <operator>? <variable>+ % ',' '}'
@@ -176,13 +257,19 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
     our class Actions {
 
         has @.PARTS = ();
+        has Match $!last-bit;
 
         method TOP($/) {
             $/.make(@!PARTS);
         }
 
         method bits($/) {
-            @!PARTS.push($/.Str);
+            # This shouldn't be necessary but I can't work out why
+            # the last bit is duplicated
+            if !$!last-bit.defined || $/.from  != $!last-bit.from {
+                @!PARTS.push($/.Str);
+            }
+            $!last-bit = $/;
         }
 
         method expression($/) {
