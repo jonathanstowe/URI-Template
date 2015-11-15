@@ -138,6 +138,32 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
     }
 
+    sub get-joiner(Str $operator) {
+        my $joiner = do given $operator {
+            when '/' {
+                '/';
+            }
+            when '&' {
+                '&';
+            }
+            when '?' {
+                '&';
+            }
+            when '.' {
+                '.';
+            }
+            when ';' {
+                ';';
+            }
+            default {
+                ',';
+            }
+        }
+
+        $joiner;
+
+    }
+
     class Expression {
         has $.operator;
         has Variable @.variables;
@@ -151,27 +177,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
                @processed-bits.push($variable.process($.operator, %vars));
             }
 
-            my $joiner = do given $!operator {
-                when '/' {
-                    '/';
-                }
-                when '&' {
-                    '&';
-                }
-                when '?' {
-                    '&';
-                }
-                when '.' {
-                    '.';
-                }
-                when ';' {
-                    ';';
-                }
-                default {
-                    ',';
-                }
-            }
-
+            my $joiner = get-joiner($!operator);
             $str = @processed-bits.join($joiner);
 
             if $!operator.defined && $!operator ne '+' {
