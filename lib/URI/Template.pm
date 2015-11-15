@@ -47,31 +47,36 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         has Int $.max-length;
         has Bool $.explode;
 
-        multi method process(Str:U $, *%vars) {
+        multi method process(Str:U $, %vars) {
+            my Str $res;
+
+            if %vars{$!name}:exists {
+                $res = uri_encode_component(%vars{$!name});
+            }
+            $res;
         }
 
-        multi method process('+', *%vars) {
+        multi method process('+', %vars) {
         }
 
-        multi method process('/', *%vars) {
+        multi method process('/', %vars) {
         }
 
-        multi method process('#', *%vars) {
+        multi method process('#', %vars) {
         }
 
-        multi method process('&', *%vars ) {
+        multi method process('&', %vars ) {
 
         }
 
-        multi method process(';', *%vars ) {
+        multi method process(';', %vars ) {
         }
 
-        multi method process('?', *%vars ) {
+        multi method process('?', %vars ) {
         }
 
-        multi method process('.', *%vars ) {
+        multi method process('.', %vars ) {
         }
-
 
     }
 
@@ -81,6 +86,16 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
         method process(%vars) returns Str {
             my Str $str;
+
+            my @processed-bits;
+
+            for self.variables -> $variable {
+               @processed-bits.push($variable.process($.operator, %vars));
+            }
+
+            my $joiner = ',';
+
+            $str = @processed-bits.join($joiner);
 
             $str;
         }
