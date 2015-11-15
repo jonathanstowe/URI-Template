@@ -79,7 +79,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         has $.operator;
         has Variable @.variables;
 
-        method process(*%vars) returns Str {
+        method process(%vars) returns Str {
             my Str $str;
 
             $str;
@@ -207,7 +207,9 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             if $!template.defined {
 
             
-                my $match = Grammar.parse($!template, Actions.new);
+                my $actions = Actions.new;
+
+                my $match = URI::Template::Grammar.parse($!template, :$actions);
 
                 if $match {
                     @!parts = $match.made;
