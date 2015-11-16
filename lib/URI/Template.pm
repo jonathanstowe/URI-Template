@@ -42,6 +42,11 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
     has @.parts;
 
 
+    #| Simply a marker to indicate whether encoding need happen
+    role PreEncoded {
+
+    }
+
     class Variable {
         has Str $.name;
         has Int $.max-length;
@@ -74,7 +79,9 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method expand-value(Str $operator, @value) {
 
             my $joiner = self.get-joiner($operator);
-            my Str $exp-value = @value.join($joiner);
+            my Str $exp-value = @value.map(&uri_encode_component).join($joiner);
+
+            $exp-value does PreEncoded;
 
             return $exp-value;
         }
@@ -85,7 +92,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         }
 
         method get-joiner(Str $operator) returns Str {
-            my $joiner = self.explode ?? $operator !! ',';
+            my $joiner = self.explode ?? $operator // ',' !! ',';
             $joiner;
         }
 
