@@ -96,77 +96,62 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             $joiner;
         }
 
-        multi method process(Str:U $, %vars) {
-            my Str $res;
+        #| Returns the appropriate encoding sub for the operator
+        method !get-encoder(Str $operator) returns Callable {
+            my &encoder = do if $operator.defined {
+                given $operator {
+                    when /<[\+\/\#\;\.]>/ {
+                        &uri_encode;
+                    }
+                    default {
+                        &uri_encode_component;
+                    }
+                }
+            }
+            else {
+                &uri_encode_component;
+            }
+            &encoder;
+        }
 
-            if self.get-value(Str, %vars) -> $val {
-                $res = uri_encode_component($val);
+        #| encode the string if it it needed
+        method !encode-expanded(Str $operator, Str $value) returns Str {
+            my $res = do if $value ~~ PreEncoded {
+                $value;
+            }
+            else {
+                self!get-encoder($operator).($value);
+            }
+
+            $res;
+        }
+
+        multi method process(Str $operator, %vars) {
+            my Str $res = self!get-primer($operator);
+
+            if self.get-value($operator, %vars) -> $val {
+                my $eq = $operator.defined && $operator eq ';' ?? '=' !! '';
+                $res ~= $eq  ~ self!encode-expanded($operator, $val);
             }
             $res;
         }
 
-        multi method process('+', %vars) {
-            my Str $res;
-
-            if self.get-value('+', %vars) -> $val {
-                $res = uri_encode($val);
+        method !get-primer(Str $operator) returns Str {
+            my Str $primer = do given $operator {
+                when '&' {
+                    $!name ~ '=';
+                }
+                when '?' {
+                    $!name ~ '=';
+                }
+                when ';' {
+                    $!name;
+                }
+                default {
+                    Str;
+                }
             }
-            $res;
-        }
-
-        multi method process('/', %vars) {
-            my Str $res;
-
-            if self.get-value('/',%vars) -> $val {
-                $res = uri_encode($val);
-            }
-            $res;
-        }
-
-        multi method process('#', %vars) {
-            my Str $res;
-
-            if self.get-value('#', %vars) -> $val {
-                $res = uri_encode($val);
-            }
-            $res;
-        }
-
-        multi method process('&', %vars ) {
-            my Str $res = $!name ~ '=';
-
-            if self.get-value('&', %vars) -> $val {
-                $res ~= uri_encode_component($val);
-            }
-            $res;
-
-        }
-
-        multi method process(';', %vars ) {
-            my Str $res = $!name;
-
-            if self.get-value(';', %vars) -> $val {
-                $res ~= '=' ~ uri_encode($val);
-            }
-            $res;
-        }
-
-        multi method process('?', %vars ) {
-            my Str $res = $!name ~ '=';
-
-            if self.get-value('?', %vars) -> $val {
-                $res ~= uri_encode_component($val);
-            }
-            $res;
-        }
-
-        multi method process('.', %vars ) {
-            my Str $res;
-
-            if self.get-value('.', %vars) -> $val {
-                $res = uri_encode($val);
-            }
-            $res;
+            $primer;
         }
 
     }
