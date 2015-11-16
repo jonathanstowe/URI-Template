@@ -47,26 +47,52 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         has Int $.max-length;
         has Bool $.explode;
 
-        method get-value(%vars) returns Str {
+        method get-value(Str $operator, %vars) returns Str {
             my Str $value;
 
             if %vars{$!name}:exists {
-                $value = %vars{$!name};
+                $value = self.expand-value($operator, %vars{$!name});
 
-                if $!max-length {
-                    $value = $value.substr(0, $!max-length);
-                }
             }
 
-
-
             $value;
+        }
+
+        multi method expand-value(Str $operator, $value) {
+            my Str $exp-value;
+
+
+            if $!max-length {
+                $exp-value = $value.substr(0, $!max-length);
+            }
+            else {
+                $exp-value = $value;
+            }
+            $exp-value;
+        }
+
+        multi method expand-value(Str $operator, @value) {
+
+            my $joiner = self.get-joiner($operator);
+            my Str $exp-value = @value.join($joiner);
+
+            return $exp-value;
+        }
+
+        multi method expand-value(Str $operator, %value) {
+            say "hash";
+
+        }
+
+        method get-joiner(Str $operator) returns Str {
+            my $joiner = self.explode ?? $operator !! ',';
+            $joiner;
         }
 
         multi method process(Str:U $, %vars) {
             my Str $res;
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value(Str, %vars) -> $val {
                 $res = uri_encode_component($val);
             }
             $res;
@@ -75,7 +101,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process('+', %vars) {
             my Str $res;
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value('+', %vars) -> $val {
                 $res = uri_encode($val);
             }
             $res;
@@ -84,7 +110,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process('/', %vars) {
             my Str $res;
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value('/',%vars) -> $val {
                 $res = uri_encode($val);
             }
             $res;
@@ -93,7 +119,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process('#', %vars) {
             my Str $res;
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value('#', %vars) -> $val {
                 $res = uri_encode($val);
             }
             $res;
@@ -102,7 +128,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process('&', %vars ) {
             my Str $res = $!name ~ '=';
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value('&', %vars) -> $val {
                 $res ~= uri_encode_component($val);
             }
             $res;
@@ -112,7 +138,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process(';', %vars ) {
             my Str $res = $!name;
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value(';', %vars) -> $val {
                 $res ~= '=' ~ uri_encode($val);
             }
             $res;
@@ -121,7 +147,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process('?', %vars ) {
             my Str $res = $!name ~ '=';
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value('?', %vars) -> $val {
                 $res ~= uri_encode_component($val);
             }
             $res;
@@ -130,7 +156,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method process('.', %vars ) {
             my Str $res;
 
-            if self.get-value(%vars) -> $val {
+            if self.get-value('.', %vars) -> $val {
                 $res = uri_encode($val);
             }
             $res;
@@ -174,7 +200,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             my @processed-bits;
 
             for self.variables -> $variable {
-               @processed-bits.push($variable.process($.operator, %vars));
+               @processed-bits.push($variable.process($!operator, %vars));
             }
 
             my $joiner = get-joiner($!operator);
