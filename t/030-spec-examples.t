@@ -20,7 +20,6 @@ my $data = from-json($data-json);
 for $data.keys.sort -> $label {
     my $level-data = $data{$label};
     my $variables = $level-data<variables>.hash;
-    say $variables.perl;
     my $tests = $level-data<testcases>;
     subtest {
         for $tests.list -> $test {
