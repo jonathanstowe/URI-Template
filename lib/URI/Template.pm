@@ -43,8 +43,11 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
 
     #| Simply a marker to indicate whether encoding need happen
-    role PreEncoded {
+    my role PreEncoded {
+    }
 
+    #| Mark that we don't need the name expansion
+    my role PreExploded {
     }
 
     class Variable {
@@ -78,21 +81,81 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
         multi method expand-value(Str $operator, @value) {
 
-            my $joiner = self.get-joiner($operator);
-            my Str $exp-value = @value.map(&uri_encode_component).join($joiner);
+            my $joiner = self!get-joiner($operator);
+
+            my &exp = self!get-exploder($operator);
+            my Str $exp-value = @value.map(&uri_encode_component).map(&exp).join($joiner);
 
             $exp-value does PreEncoded;
+            if self!was-exploded($operator) {
+                $exp-value does PreExploded;
+            }
 
             return $exp-value;
         }
 
+        method !was-exploded(Str $operator) returns Bool {
+            my Bool $ret = False;
+            if $operator.defined {
+                if self.explode {
+                    if $operator ~~ any(<& ? ;>) {
+                        $ret = True;
+                    }
+                }
+            }
+            $ret;
+        }
+
+        #! return a closure to handle the array explosion
+        method !get-exploder(Str $operator) returns Callable {
+
+            my &exp =  sub ( $val ) {
+                my $exp-val = $val;
+                if $operator.defined {
+                    if self.explode {
+                        if $operator ~~ any(<& ? ;>) {
+                            $exp-val = self.name ~ "=" ~ $exp-val;
+                            $exp-val does PreExploded;
+                        }
+                    }
+                }
+                $exp-val;
+            }
+            &exp;
+        }
+
         multi method expand-value(Str $operator, %value) {
-            say "hash";
+            my Str $res;
+
+            my $joiner = self!get-joiner($operator);
+            my &enc = self!get-hash-encoder($operator);
+            if self.explode {
+                $res = %value.kv.map(&enc).map( -> $k, $v { "$k=$v"}).join($joiner);
+                $res does PreExploded;
+            }
+            else {
+                $res = %value.kv.map(&enc).join($joiner);
+            }
+
+            $res does PreEncoded;
+
+            $res;
 
         }
 
-        method get-joiner(Str $operator) returns Str {
-            my $joiner = self.explode ?? $operator // ',' !! ',';
+        #| lookup for the joiners
+        my %joiners = (
+                        '+'  =>     ",",
+                        '#'  =>     ",",
+                        '.'  =>     ".",
+                        '/'  =>     "/",
+                        ';'  =>     ";",
+                        '?'  =>     "&",
+                        '&'  =>     "&" ,
+        );
+
+        method !get-joiner(Str $operator) returns Str {
+            my $joiner = self.explode ?? $operator.defined ?? %joiners{$operator} !! ',' !! ',';
             $joiner;
         }
 
@@ -101,6 +164,25 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             my &encoder = do if $operator.defined {
                 given $operator {
                     when /<[\+\/\#\;\.]>/ {
+                        &uri_encode;
+                    }
+                    default {
+                        &uri_encode_component;
+                    }
+                }
+            }
+            else {
+                &uri_encode_component;
+            }
+            &encoder;
+        }
+
+        #| Returns the appropriate encoding sub for the operator
+        #| this is special for the hash case for the time being
+        method !get-hash-encoder(Str $operator) returns Callable {
+            my &encoder = do if $operator.defined {
+                given $operator {
+                    when /<[\+\#]>/ {
                         &uri_encode;
                     }
                     default {
@@ -127,11 +209,17 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         }
 
         multi method process(Str $operator, %vars) {
-            my Str $res = self!get-primer($operator);
+            my Str $res;
 
             if self.get-value($operator, %vars) -> $val {
-                my $eq = $operator.defined && $operator eq ';' ?? '=' !! '';
-                $res ~= $eq  ~ self!encode-expanded($operator, $val);
+                if $val !~~ PreExploded {
+                    my $eq = $operator.defined && $operator eq ';' ?? '=' !! '';
+                    $res = (self!get-primer($operator) // '') ~ $eq;
+                }
+                $res ~= self!encode-expanded($operator, $val);
+            } 
+            else {
+                $res = self!get-primer($operator);
             }
             $res;
         }
