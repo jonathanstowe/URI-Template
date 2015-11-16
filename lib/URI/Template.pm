@@ -66,7 +66,10 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             $value;
         }
 
-        multi method expand-value(Str $operator, $value) {
+        multi method expand-value(Str $operator, Any:U $) {
+            Str;
+        }
+        multi method expand-value(Str $operator, Str $value) {
             my Str $exp-value;
 
 
@@ -209,17 +212,21 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         }
 
         multi method process(Str $operator, %vars) {
-            my Str $res;
+            my $res;
 
-            if self.get-value($operator, %vars) -> $val {
+            my $val = self.get-value($operator, %vars);
+            if $val {
                 if $val !~~ PreExploded {
                     my $eq = $operator.defined && $operator eq ';' ?? '=' !! '';
                     $res = (self!get-primer($operator) // '') ~ $eq;
                 }
                 $res ~= self!encode-expanded($operator, $val);
             } 
+            elsif $val.defined {
+               $res = self!get-primer($operator);
+            }
             else {
-                $res = self!get-primer($operator);
+                $res = Nil;
             }
             $res;
         }
@@ -277,16 +284,16 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         method process(%vars) returns Str {
             my Str $str;
 
-            my @processed-bits;
+            my @processed-bits = ();
 
             for self.variables -> $variable {
                @processed-bits.push($variable.process($!operator, %vars));
             }
 
             my $joiner = get-joiner($!operator);
-            $str = @processed-bits.join($joiner);
+            $str = @processed-bits.grep(Str).map({ $_ // ''}).join($joiner);
 
-            if $!operator.defined && $!operator ne '+' {
+            if $!operator.defined && $!operator ne '+' && $str.defined {
                 $str = $!operator ~ $str;
             }
 
