@@ -163,7 +163,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         method !get-encoder(Str $operator) returns Callable {
             my &encoder = do if $operator.defined {
                 given $operator {
-                    when /<[\+\/\#\;\.]>/ {
+                    when /<[\+\#\;\.]>/ {
                         &uri_encode;
                     }
                     default {
