@@ -26,10 +26,6 @@ for $data.keys.sort -> $label {
             my $ut = URI::Template.new(template => $test[0]);
 
             my $processed;
-            if $level-data<level> == 4 {
-                todo("aggregate values NYI",2);
-
-            }
             lives-ok { $processed = $ut.process(|$variables); }, "process";
             is $processed, any($test[1].list), "'{ $test[0] }' expands to '{ $test[1].list.join(" or ") }'";
         }
