@@ -518,14 +518,18 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
     }
 
+    #| thrown when no template
     class X::NoTemplate is Exception {
         has $.message = "Template is not defined";
     }
 
+    #| thrown when template can't be parsed
     class X::InvalidTemplate is Exception {
         has $.message = "Invalid or un-parseable template";
     }
 
+    #| accessor for the parsed parts of the template
+    #| forces it to be made if it hasn't been already
     method parts() {
         if not @!parts.elems {
 
