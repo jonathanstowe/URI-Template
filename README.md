@@ -53,11 +53,19 @@ welcomed via github at
 
    https://github.com/jonathanstowe/URI-Template
 
+The test data covers all of the examples given in the RFC and a few others,
+if you think the behaviour is incorrect please state the section of the RFC
+and provide a failing example with the required variables, template and the
+expected output.
+
+
 ## Licence
 
 Please see the LICENCE file in the distribution
 
 (C) Jonathan Stowe 2015
 
+The testing uses the test data from https://github.com/uri-templates/uritemplate-test
+please see the README.md in the t/data/uritemplate-test for the license for that project.
 
 
