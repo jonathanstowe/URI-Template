@@ -84,17 +84,21 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
 
         multi method expand-value(Str $operator, @value) {
 
-            my $joiner = self!get-joiner($operator);
+            if @value.elems {
+                my $joiner = self!get-joiner($operator);
+                my &exp = self!get-exploder($operator);
+                my Str $exp-value = @value.map(&uri_encode_component).map(&exp).join($joiner);
+    
+                $exp-value does PreEncoded;
+                if self!was-exploded($operator) {
+                    $exp-value does PreExploded;
+                }
 
-            my &exp = self!get-exploder($operator);
-            my Str $exp-value = @value.map(&uri_encode_component).map(&exp).join($joiner);
-
-            $exp-value does PreEncoded;
-            if self!was-exploded($operator) {
-                $exp-value does PreExploded;
+                return $exp-value;
             }
-
-            return $exp-value;
+            else {
+                Nil;
+            }
         }
 
         method !was-exploded(Str $operator) returns Bool {
@@ -291,14 +295,39 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             }
 
             my $joiner = get-joiner($!operator);
-            $str = @processed-bits.grep(Str).map({ $_ // ''}).join($joiner);
+
+            my &filter = self!get-part-filter;
+
+            my $show-op = self!show-operator(@processed-bits);
+
+            $str = @processed-bits.grep(&filter).map({ $_ // ''}).join($joiner);
 
             if $!operator.defined && $!operator ne '+' && $str.defined {
-                $str = $!operator ~ $str;
+                $str = ($show-op ?? $!operator !! '') ~ $str;
             }
 
             $str;
         }
+
+        method !show-operator(@bits) {
+            my &pc = self!get-part-filter;
+            return ?@bits.grep(&pc);
+        }
+
+        # This is a bit hacky but adjusting to match the spec
+        method !get-part-filter() {
+            sub ( $value ) {
+                my Bool $rc;
+                if $!operator.defined && $!operator eq '#' {
+                    $rc = $value ~~ Str;
+                }
+                else {
+                    $rc = $value ~~ Str;
+                }
+                $rc;
+            }
+        }
+
     }
 
     has Grammar $.grammar = our grammar Grammar {
