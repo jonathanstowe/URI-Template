@@ -69,6 +69,10 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         multi method expand-value(Str $operator, Any:U $) {
             Str;
         }
+
+        multi method expand-value(Str $operator, Numeric:D $value) {
+            self.expand-value($operator, $value.Str);
+        }
         multi method expand-value(Str $operator, Str $value) {
             my Str $exp-value;
 
@@ -132,21 +136,26 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
         }
 
         multi method expand-value(Str $operator, %value) {
-            my Str $res;
 
-            my $joiner = self!get-joiner($operator);
-            my &enc = self!get-hash-encoder($operator);
-            if self.explode {
-                $res = %value.kv.map(&enc).map( -> $k, $v { "$k=$v"}).join($joiner);
-                $res does PreExploded;
+            if ?%value.keys {
+                my Str $res;
+                my $joiner = self!get-joiner($operator);
+                my &enc = self!get-hash-encoder($operator);
+                if self.explode {
+                    $res = %value.kv.map(&enc).map( -> $k, $v { "$k=$v"}).join($joiner);
+                    $res does PreExploded;
+                }
+                else {
+                    $res = %value.kv.map(&enc).join($joiner);
+                }
+
+                $res does PreEncoded;
+
+                $res;
             }
             else {
-                $res = %value.kv.map(&enc).join($joiner);
+                Nil;
             }
-
-            $res does PreEncoded;
-
-            $res;
 
         }
 
@@ -384,7 +393,7 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
             <variable-name><var-modifier>?
         }
         regex variable-name {
-            <.ident>
+             <-[\s,\:\*\}]>+
         }
 
         rule var-modifier {
