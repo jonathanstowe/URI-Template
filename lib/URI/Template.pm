@@ -22,13 +22,79 @@ say $template.process(foo => 'baz', bar => 'quux'); # http://foo.com/baz/quux
 
 This provides an implementation of
 L<RFC6570|https://tools.ietf.org/html/rfc6570> which allows for the
-definition of a URI through variable expansion.
+definition of a URI through variable expansion. Please refer to the
+specification for full details of the template expansion.
+
+=head2 Overview of templates
+
+A URI template comprises a string representing a full or partial URI
+containing on or more template expressions.  A template expression
+is delimited by curly braces ('{', '}',) and may contain one or more
+variable names to be expanded separated by commas.  The variables may
+be qualified by either an integer maximum length (separated from the
+variable name by a ':',) or by a '*' that indicates that aggregate
+values should be 'exploded', (how this explosion manifests in detail
+depends on the expression 'operator' and is described in the specification.)
+
+The expression can be modified with an optional 'operator' which should be
+supplied immediately after the opening '{', the operator may modify the
+way in which the values of the variables are encoded, the way that multiple
+variables are joined in the same expression and the way in which aggregate
+variable values are expanded.
+
+The operators and their general meaning are thus:
+
+=begin code
+
+      +   Reserved character strings;
+
+      #   Fragment identifiers prefixed by "#";
+
+      .   Name labels or extensions prefixed by ".";
+
+      /   Path segments prefixed by "/";
+
+      ;   Path parameter name or name=value pairs prefixed by ";";
+
+      ?   Query component beginning with "?" and consisting of
+          name=value pairs separated by "&"; and,
+
+      &   Continuation of query-style &name=value pairs within
+          a literal query component.
+
+=end code
 
 =head1 METHODS
 
 =head2 method new
+    
+    method new(Str :$template) returns URI::Template
+
+The constructor of the class.  The C<$template> must be a valid URI template if
+it is provided.  If it is not provided to the constructor then it must be provided
+by setting the attribute accessor before C<process> is called.
 
 =head2 method process
+
+    method process(*%variables) returns Str
+
+Expand the template with the values of the template variables specified as named
+arguments.  If no C<template> has been provided then a C<X::NoTemplate> exception
+will be thrown.  If the provided template is unable to be parsed then a
+C<X::InvalidTemplate> exception will be thrown.
+
+=head2 method template
+
+    method template() returns Str is rw
+
+A read/write public accessor for the template.  If this parameter is not set by
+the accessor it must be set using C<template> before C<process> is called.
+
+Because of the way the template is parsed it will only be done once for any 
+given C<URI::Template> object, so setting this after C<process> has been called
+for the first time will have no effect.  If you need a different template it is
+recommended to use a different object.
+
 
 =end pod
 
