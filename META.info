@@ -24,5 +24,5 @@
     "Test::META"
   ],
   "description" : "URI Templates as per https://tools.ietf.org/html/rfc6570",
-  "version" : "v0.0.1"
+  "version" : "v0.0.2"
 }

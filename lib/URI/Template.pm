@@ -98,7 +98,7 @@ recommended to use a different object.
 
 =end pod
 
-class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
+class URI::Template:ver<v0.0.2>:auth<github:jonathanstowe> {
 
     use URI::Encode;
 
@@ -208,11 +208,11 @@ class URI::Template:ver<v0.0.1>:auth<github:jonathanstowe> {
                 my $joiner = self!get-joiner($operator);
                 my &enc = self!get-hash-encoder($operator);
                 if self.explode {
-                    $res = %value.kv.map(&enc).map( -> $k, $v { "$k=$v"}).join($joiner);
+                    $res = %value.kv.map({.Str}).map(&enc).map( -> $k, $v { "$k=$v"}).join($joiner);
                     $res does PreExploded;
                 }
                 else {
-                    $res = %value.kv.map(&enc).join($joiner);
+                    $res = %value.kv.map({.Str}).map(&enc).join($joiner);
                 }
 
                 $res does PreEncoded;
