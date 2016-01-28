@@ -47,8 +47,7 @@ Other install mechanisms may be become available in the future.
 
 ## Support
 
-This should be considered experimental software until such time that
-Perl 6 reaches an official release.  However suggestions/patches are
+Suggestions/patches are
 welcomed via github at
 
    https://github.com/jonathanstowe/URI-Template
