@@ -9,9 +9,9 @@ use URI::Template;
 
 
 
-my IO::Path $data-dir = $*PROGRAM.parent.child('data');
+my IO::Path $data-dir = $*PROGRAM.parent.add('data');
 
-my IO::Path $spec-examples = $data-dir.child('uritemplate-test/spec-examples-by-section.json');
+my IO::Path $spec-examples = $data-dir.add('uritemplate-test/spec-examples-by-section.json');
 
 my $data-json = $spec-examples.open(:r).slurp-rest;
 
