@@ -22,8 +22,7 @@
   "license": "Artistic-2.0",
   "test-depends": [
     "JSON::Fast",
-    "Test",
-    "Test::META"
+    "Test"
   ],
   "provides": {
     "URI::Template": "lib/URI/Template.pm"
