@@ -1,5 +1,9 @@
 {
   "name": "URI::Template",
+  "version": "0.0.7",
+  "auth": "github:jonathanstowe",
+  "aoi": "1.0",
+  "description": "URI Templates as per https://tools.ietf.org/html/rfc6570",
   "source-url": "git://github.com/jonathanstowe/URI-Template.git",
   "support": {
       "email" : "jns+git@gellyfish.co.uk",
@@ -11,7 +15,6 @@
   "resources": [],
   "build-depends": [],
   "author": "Jonathan Stowe <jns+git@gellyfish.co.uk>",
-  "auth": "github:jonathanstowe",
   "depends": [],
   "tags": [
     "URI",
@@ -27,10 +30,8 @@
   "provides": {
     "URI::Template": "lib/URI/Template.pm"
   },
-  "version": "0.0.6",
   "authors": [
     "Jonathan Stowe <jns+git@gellyfish.co.uk>"
   ],
-  "description": "URI Templates as per https://tools.ietf.org/html/rfc6570",
   "meta-version": "0"
 }

@@ -4,7 +4,7 @@ Implementation of https://tools.ietf.org/html/rfc6570 for Perl 6
 
 ## Synopsis
 
-```
+```perl6
 
 use URI::Template;
 
@@ -47,7 +47,7 @@ expected output.
 
 Please see the LICENCE file in the distribution
 
-© Jonathan Stowe 2015, 2016, 2017
+© Jonathan Stowe 2015, 2016, 2017, 2019
 
 The testing uses the test data from https://github.com/uri-templates/uritemplate-test
 please see the README.md in the t/data/uritemplate-test for the license for that project.
