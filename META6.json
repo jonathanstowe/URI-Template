@@ -7,7 +7,7 @@
       "source": "git://github.com/jonathanstowe/URI-Template.git",
       "bugtracker": "https://github.com/jonathanstowe/URI-Template/issues"
   },
-  "perl": "6.c",
+  "perl": "6.*",
   "resources": [],
   "build-depends": [],
   "author": "Jonathan Stowe <jns+git@gellyfish.co.uk>",
