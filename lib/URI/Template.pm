@@ -119,7 +119,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         has Int $.max-length;
         has Bool $.explode;
 
-        method get-value(Str $operator, %vars) returns Str {
+        method get-value(Str $operator, %vars --> Str ) {
             my Str $value;
 
             if %vars{$!name}:exists {
@@ -169,7 +169,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
             }
         }
 
-        method !was-exploded(Str $operator) returns Bool {
+        method !was-exploded(Str $operator --> Bool ) {
             my Bool $ret = False;
             if $operator.defined {
                 if self.explode {
@@ -182,7 +182,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         }
 
         #! return a closure to handle the array explosion
-        method !get-exploder(Str $operator) returns Callable {
+        method !get-exploder(Str $operator --> Callable ) {
 
             my &exp =  sub ( $val ) {
                 my $exp-val = $val;
@@ -235,7 +235,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         );
 
         #| Get the appropriate character to join elements
-        method !get-joiner(Str $operator) returns Str {
+        method !get-joiner(Str $operator --> Str ) {
             my $joiner = self.explode ?? $operator.defined ?? %joiners{$operator} !! ',' !! ',';
             $joiner;
         }
@@ -255,7 +255,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         }
 
         #| Returns the appropriate encoding sub for the operator
-        method !get-encoder(Str $operator) returns Callable {
+        method !get-encoder(Str $operator --> Callable ) {
             my &encoder = do if $operator.defined {
                 given $operator {
                     when /<[\+\#\;\.]>/ {
@@ -274,7 +274,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
 
         #| Returns the appropriate encoding sub for the operator
         #| this is special for the hash case for the time being
-        method !get-hash-encoder(Str $operator) returns Callable {
+        method !get-hash-encoder(Str $operator --> Callable ) {
             my &encoder = do if $operator.defined {
                 given $operator {
                     when /<[\+\#]>/ {
@@ -292,7 +292,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         }
 
         #| encode the string if it it needed
-        method !encode-expanded(Str $operator, Str $value) returns Str {
+        method !encode-expanded(Str $operator, Str $value --> Str ) {
             my $res = do if $value ~~ PreEncoded {
                 $value;
             }
@@ -323,7 +323,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
             $res;
         }
 
-        method !get-primer(Str $operator) returns Str {
+        method !get-primer(Str $operator --> Str ) {
             my Str $primer = do given $operator {
                 when '&' {
                     $!name ~ '=';
@@ -373,7 +373,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         has $.operator;
         has Variable @.variables;
 
-        method process(%vars) returns Str {
+        method process(%vars --> Str ) {
             my Str $str;
 
             my @processed-bits = ();
@@ -567,7 +567,7 @@ class URI::Template:ver<0.0.6>:auth<github:jonathanstowe> {
         @!parts;
     }
 
-    method process(*%vars) returns Str {
+    method process(*%vars --> Str ) {
         my Str $string;
 
         for self.parts -> $part {
