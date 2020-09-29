@@ -1,4 +1,4 @@
-#!perl6
+#!/usr/bin/env raku
 
 use v6;
 
@@ -17,4 +17,4 @@ $t = URI::Template.new(template => '{?foo/boo');
 throws-like { $t.process(foo => 1, bar => 2) }, X::InvalidTemplate, "throws 'X::InvalidTemplate' with a broken template";
 
 done-testing;
-# vim: expandtab shiftwidth=4 ft=perl6
+# vim: expandtab shiftwidth=4 ft=raku

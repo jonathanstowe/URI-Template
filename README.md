@@ -1,10 +1,10 @@
 # URI::Template [![Build Status](https://travis-ci.org/jonathanstowe/URI-Template.svg?branch=master)](https://travis-ci.org/jonathanstowe/URI-Template)
 
-Implementation of https://tools.ietf.org/html/rfc6570 for Perl 6
+Implementation of https://tools.ietf.org/html/rfc6570 for Raku
 
 ## Synopsis
 
-```perl6
+```raku
 
 use URI::Template;
 
@@ -16,14 +16,11 @@ say $template.process(foo => 'baz', bar => 'quux'); # http://foo.com/baz/quux
 
 ## Description
 
-This provides an implementation of
-[RFC 6570](https://tools.ietf.org/html/rfc6570) which allows for the
-definition of a URI through variable expansion.
+This provides an implementation of [RFC 6570](https://tools.ietf.org/html/rfc6570) which allows for the definition of a URI through variable expansion.
 
 ## Installation
 
-Assuming you have a working perl6 installation you should be able to
-install this with *zef* :
+Assuming you have a working Rakudo installation you should be able to install this with *zef* :
 
     # From the source directory
    
@@ -47,7 +44,7 @@ expected output.
 
 Please see the LICENCE file in the distribution
 
-© Jonathan Stowe 2015, 2016, 2017, 2019
+© Jonathan Stowe 2015, 2016, 2017, 2019, 2020
 
 The testing uses the test data from https://github.com/uri-templates/uritemplate-test
 please see the README.md in the t/data/uritemplate-test for the license for that project.

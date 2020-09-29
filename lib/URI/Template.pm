@@ -98,7 +98,7 @@ recommended to use a different object.
 
 =end pod
 
-class URI::Template:ver<0.0.7>:auth<github:jonathanstowe>:api<1.0> {
+class URI::Template:ver<0.0.8>:auth<github:jonathanstowe>:api<1.0> {
 
     has Str $.template is rw;
 
@@ -244,13 +244,11 @@ class URI::Template:ver<0.0.7>:auth<github:jonathanstowe>:api<1.0> {
             $m.Str.encode.list.map({.fmt('%%%02X')}).join('')
         }
 
-        my sub uri-encode (Str:D $text)
-        {
+        my sub uri-encode (Str:D $text) {
             return $text.subst(/<[\x00..\x10ffff]-[a..zA..Z0..9_.~\!\+\-\#\$\&\+,\/\:;\=\?@]>/, &enc, :g);
         }
 
-        my sub uri-encode-component (Str:D $text)
-        {
+        my sub uri-encode-component (Str:D $text) {
             return $text.subst(/<[\x00..\x10ffff]-[a..zA..Z0..9_.~\-]>/, &enc, :g);
         }
 
@@ -590,4 +588,4 @@ class URI::Template:ver<0.0.7>:auth<github:jonathanstowe>:api<1.0> {
 
 
 }
-# vim: expandtab shiftwidth=4 ft=perl6
+# vim: expandtab shiftwidth=4 ft=raku

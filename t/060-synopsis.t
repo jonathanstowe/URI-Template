@@ -1,4 +1,4 @@
-#!perl6
+#!/usr/bin/env raku
 
 use v6;
 
@@ -12,4 +12,4 @@ is $template.process(foo => 'baz', bar => 'quux'), 'http://foo.com/baz/quux', "c
 
 
 done-testing;
-# vim: expandtab shiftwidth=4 ft=perl6
+# vim: expandtab shiftwidth=4 ft=raku
