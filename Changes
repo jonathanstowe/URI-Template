@@ -1,3 +1,5 @@
+v0.0.10	Sun  7 Aug 09:45:32 BST 2022
+	* Upload to zef repository
 v0.0.9		Wed 31 Mar 18:10:41 BST 2021
 	* Switch to GH actions
 v0.0.8		Tue 29 Sep 16:50:45 BST 2020
@@ -14,3 +16,4 @@ v0.0.4		Sat Mar 12 10:48:09 2016 +0000
 	* Add the travis badge to the README
 	* stringify before encoding
 	* TODO the tests if URI::Encode is still broken
+
