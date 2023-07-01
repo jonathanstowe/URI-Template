@@ -4,7 +4,7 @@
   "resources": [
   ],
   "source-url": "https://github.com/jonathanstowe/URI-Template.git",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "name": "URI::Template",
   "api": "1.0",
   "test-depends": [
@@ -20,7 +20,7 @@
   "auth": "zef:jonathanstowe",
   "license": "Artistic-2.0",
   "provides": {
-    "URI::Template": "lib/URI/Template.pm"
+    "URI::Template": "lib/URI/Template.rakumod"
   },
   "tags": [
     "URI",

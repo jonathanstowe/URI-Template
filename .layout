@@ -97,7 +97,7 @@
           "children": [
             {
               "type": "file",
-              "name": "Template.pm"
+              "name": "Template.rakumod"
             }
           ],
           "purpose": null,
